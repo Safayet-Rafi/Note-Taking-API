@@ -28,4 +28,7 @@ public class Note extends BaseEntity<UUID> {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
 
+    @Column
+    private int currentVersion;
+
 }

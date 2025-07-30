@@ -1,8 +1,17 @@
 package com.example.note.controller;
 
 import com.example.note.dto.request.CreateNoteRequest;
+import com.example.note.dto.request.UpdateNoteRequest;
 import com.example.note.model.Note;
+import com.example.note.projection.NoteResponse;
 import com.example.note.service.NoteService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,17 +28,30 @@ public class NoteController {
     }
 
     @GetMapping
-    public List<Note> getAll(){
-        return noteService.getAll();
+    public ResponseEntity<Page<NoteResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NoteResponse> result = noteService.getAll(pageable);
+        return ResponseEntity.ok(result);
     }
 
+
     @GetMapping("/{id}")
-    public Note getById(@PathVariable UUID id){
-        return noteService.getById(id);
+    public ResponseEntity<NoteResponse> getById(@PathVariable UUID id){
+        return ResponseEntity.ok(noteService.getById(id));
     }
 
     @PostMapping
-    public Note create(@RequestBody CreateNoteRequest createNoteRequest){
-        return noteService.create(createNoteRequest);
+    public ResponseEntity<?> create(@RequestBody CreateNoteRequest createNoteRequest){
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(noteService.create(createNoteRequest));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<NoteResponse> update(@PathVariable UUID id, @RequestBody UpdateNoteRequest updateNoteRequest){
+        return ResponseEntity.ok(noteService.update(id, updateNoteRequest));
     }
 }
