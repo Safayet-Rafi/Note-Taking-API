@@ -11,6 +11,7 @@ import com.example.note.projection.NoteResponse;
 import com.example.note.repository.NoteRepository;
 import com.example.note.repository.NoteVersionRepository;
 import com.example.note.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,20 +20,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class NoteService {
 
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final NoteVersionRepository noteVersionRepository;
 
-    public NoteService(NoteRepository noteRepository,
-                       UserRepository userRepository,
-                       NoteVersionRepository noteVersionRepository
-    ){
-        this.noteRepository = noteRepository;
-        this.userRepository = userRepository;
-        this.noteVersionRepository = noteVersionRepository;
-    }
 
     public Page<NoteResponse> getAll(Pageable pageable){
 

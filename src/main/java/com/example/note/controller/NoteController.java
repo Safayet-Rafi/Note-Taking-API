@@ -5,6 +5,7 @@ import com.example.note.dto.request.UpdateNoteRequest;
 import com.example.note.model.Note;
 import com.example.note.projection.NoteResponse;
 import com.example.note.service.NoteService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +20,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/notes")
+@AllArgsConstructor
 public class NoteController {
 
     private final NoteService noteService;
 
-    public NoteController(NoteService noteService) {
-        this.noteService = noteService;
-    }
 
     @GetMapping
     public ResponseEntity<Page<NoteResponse>> getAll(
