@@ -13,7 +13,10 @@ import java.util.UUID;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, UUID> {
 
-    Page<NoteResponse> findAllByUserId(UUID userId, Pageable pageable);
+    Page<NoteResponse> findAllByUserIdAndDeletedAtIsNull(UUID userId, Pageable pageable);
 
-    Optional<NoteResponse> findProjectionByIdAndUserId(UUID id, UUID userId);
+    Optional<NoteResponse> findProjectionByIdAndUserIdAndDeletedAtIsNull(UUID id, UUID userId);
+
+    Optional<Note> findByIdAndUserIdAndDeletedAtIsNull(UUID id, UUID userId);
+
 }

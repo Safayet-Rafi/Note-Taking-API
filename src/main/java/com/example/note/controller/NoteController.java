@@ -50,4 +50,11 @@ public class NoteController {
         return ResponseEntity.ok(noteService.update(id, updateNoteRequest));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
+        noteService.delete(id);
+        return ResponseEntity.ok("Note deleted successfully");
+    }
+
+
 }

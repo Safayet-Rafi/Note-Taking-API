@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -28,17 +29,17 @@ public class NoteService {
 
 
 
-    public Page<NoteResponse> getAll(Pageable pageable){
+    public Page<NoteResponse> getAll(Pageable pageable) {
         UUID userId = getCurrentUserId();
-        return noteRepository.findAllByUserId(userId, pageable);
+        return noteRepository.findAllByUserIdAndDeletedAtIsNull(userId, pageable);
     }
-
 
     public NoteResponse getById(UUID id) {
         UUID userId = getCurrentUserId();
-        return noteRepository.findProjectionByIdAndUserId(id, userId)
+        return noteRepository.findProjectionByIdAndUserIdAndDeletedAtIsNull(id, userId)
                 .orElseThrow(() -> new NoteNotFoundException("Note not found"));
     }
+
 
     public String create(CreateNoteRequest createNoteRequest){
         User user = getCurrentUser();
@@ -75,9 +76,19 @@ public class NoteService {
         noteRepository.save(note);
 
         UUID userId = getCurrentUserId();
-        return noteRepository.findProjectionByIdAndUserId(id, userId)
+        return noteRepository.findProjectionByIdAndUserIdAndDeletedAtIsNull(id, userId)
                 .orElseThrow( () -> new NoteNotFoundException("Note Not Found"));
     }
+
+    public void delete(UUID id) {
+        UUID userId = getCurrentUserId();
+        Note note = noteRepository.findByIdAndUserIdAndDeletedAtIsNull(id, userId)
+                .orElseThrow(() -> new NoteNotFoundException("Note not found"));
+
+        note.setDeletedAt(LocalDateTime.now());
+        noteRepository.save(note);
+    }
+
 
     private User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
