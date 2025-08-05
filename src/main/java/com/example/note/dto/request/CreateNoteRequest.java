@@ -4,7 +4,6 @@ import java.util.UUID;
 
 public record CreateNoteRequest(
         String title,
-        String content,
-        UUID userId
+        String content
 ) {
 }

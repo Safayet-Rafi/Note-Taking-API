@@ -35,7 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-            return;  // no JWT token present, continue filter chain
+            return;
         }
 
         jwt = authHeader.substring(7);

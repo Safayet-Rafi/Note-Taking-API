@@ -2,20 +2,16 @@ package com.example.note.controller;
 
 import com.example.note.dto.request.CreateNoteRequest;
 import com.example.note.dto.request.UpdateNoteRequest;
-import com.example.note.model.Note;
-import com.example.note.projection.NoteResponse;
+import com.example.note.dto.response.NoteResponse;
 import com.example.note.service.NoteService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -53,4 +49,5 @@ public class NoteController {
     public ResponseEntity<NoteResponse> update(@PathVariable UUID id, @RequestBody UpdateNoteRequest updateNoteRequest){
         return ResponseEntity.ok(noteService.update(id, updateNoteRequest));
     }
+
 }
