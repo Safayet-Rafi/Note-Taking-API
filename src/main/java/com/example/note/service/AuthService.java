@@ -1,5 +1,6 @@
 package com.example.note.service;
 
+import com.example.note.dto.request.RefreshTokenRequest;
 import com.example.note.dto.request.SignInRequest;
 import com.example.note.dto.request.SignUpRequest;
 import com.example.note.dto.response.SignInResponse;
@@ -33,7 +34,8 @@ public class AuthService {
                 signUpRequest.username(),
                 signUpRequest.email(),
                 passwordEncoder.encode(signUpRequest.password()),
-                Role.USER
+                Role.USER,
+                null
         );
 
         userRepository.save(user);
@@ -49,9 +51,31 @@ public class AuthService {
         User user = userRepository.findByEmail(signInRequest.email())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
-        return new SignInResponse(token);
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
 
+        return new SignInResponse(accessToken, refreshToken);
+
+    }
+
+    public SignInResponse refreshAccessToken(RefreshTokenRequest request){
+        String providedRefreshToken = request.refreshToken();
+        String email = jwtUtil.extractUsername(providedRefreshToken);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow( () -> new UserNotFoundException("User not found"));
+
+        String storedRefreshToken = user.getRefreshToken();
+
+        if(!providedRefreshToken.equals(storedRefreshToken) || !jwtUtil.isTokenValid(providedRefreshToken, email)){
+            throw new RuntimeException("Token is not valid");
+        }
+
+        String newAccessToken = jwtUtil.generateAccessToken(email);
+
+        return new SignInResponse(newAccessToken, storedRefreshToken);
     }
 }

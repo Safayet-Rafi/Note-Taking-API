@@ -36,6 +36,9 @@ public class User extends BaseEntity<UUID> implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column
+    private String refreshToken;
+
     @Override
     public String getUsername() {
         return email;

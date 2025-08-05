@@ -1,5 +1,6 @@
 package com.example.note.controller;
 
+import com.example.note.dto.request.RefreshTokenRequest;
 import com.example.note.dto.request.SignInRequest;
 import com.example.note.dto.request.SignUpRequest;
 import com.example.note.dto.response.SignInResponse;
@@ -27,4 +28,8 @@ public class AuthController {
         return authService.signIn(signInRequest);
     }
 
+    @PostMapping("/refresh-token")
+    public SignInResponse refreshAccessToken(@RequestBody RefreshTokenRequest request){
+        return authService.refreshAccessToken(request);
+    }
 }

@@ -1,6 +1,6 @@
 package com.example.note.dto.response;
 
 public record SignInResponse(
-        String token
-) {
-}
+        String accessToken,
+        String refreshToken
+) {}
