@@ -3,6 +3,7 @@ package com.example.note.controller;
 import com.example.note.dto.request.CreateNoteRequest;
 import com.example.note.dto.request.UpdateNoteRequest;
 import com.example.note.dto.response.NoteResponse;
+import com.example.note.dto.response.PagedResponse;
 import com.example.note.service.NoteService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,14 +24,15 @@ public class NoteController {
 
 
     @GetMapping
-    public ResponseEntity<Page<NoteResponse>> getAll(
+    public ResponseEntity<PagedResponse<NoteResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<NoteResponse> result = noteService.getAll(pageable);
-        return ResponseEntity.ok(result);
+        PagedResponse<NoteResponse> response = noteService.getAll(pageable);
+        return ResponseEntity.ok(response);
     }
+
 
 
     @GetMapping("/{id}")

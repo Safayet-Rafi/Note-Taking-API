@@ -3,6 +3,7 @@ package com.example.note.service;
 import com.example.note.dto.request.CreateNoteRequest;
 import com.example.note.dto.request.UpdateNoteRequest;
 import com.example.note.dto.response.NoteResponse;
+import com.example.note.dto.response.PagedResponse;
 import com.example.note.exception.NoteNotFoundException;
 import com.example.note.model.Note;
 import com.example.note.model.NoteVersion;
@@ -31,10 +32,21 @@ public class NoteService {
     private final NoteVersionRepository noteVersionRepository;
 
 
-    public Page<NoteResponse> getAll(Pageable pageable) {
+    @Cacheable(value = "notes", key = "'all-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public PagedResponse<NoteResponse> getAll(Pageable pageable) {
         UUID userId = getCurrentUserId();
-        return noteRepository.findAllByUserIdAndDeletedAtIsNull(userId, pageable);
+        Page<NoteResponse> page = noteRepository.findAllByUserIdAndDeletedAtIsNull(userId, pageable);
+
+        return new PagedResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
+
 
     @Cacheable(value = "notes", key = "#id")
     public NoteResponse getById(UUID id) {
