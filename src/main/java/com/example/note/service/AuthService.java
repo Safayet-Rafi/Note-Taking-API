@@ -78,4 +78,26 @@ public class AuthService {
 
         return new SignInResponse(newAccessToken, storedRefreshToken);
     }
+
+    public void logout(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractUsername(token);
+
+
+        if (!jwtUtil.isTokenValid(token, email)) {
+            throw new RuntimeException("Invalid or expired token");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        user.setRefreshToken(null);
+        userRepository.save(user);
+    }
+
+
 }
