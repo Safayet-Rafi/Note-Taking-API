@@ -11,6 +11,9 @@ import com.example.note.repository.NoteRepository;
 import com.example.note.repository.NoteVersionRepository;
 import com.example.note.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,12 +31,12 @@ public class NoteService {
     private final NoteVersionRepository noteVersionRepository;
 
 
-
     public Page<NoteResponse> getAll(Pageable pageable) {
         UUID userId = getCurrentUserId();
         return noteRepository.findAllByUserIdAndDeletedAtIsNull(userId, pageable);
     }
 
+    @Cacheable(value = "notes", key = "#id")
     public NoteResponse getById(UUID id) {
         UUID userId = getCurrentUserId();
         return noteRepository.findProjectionByIdAndUserIdAndDeletedAtIsNull(id, userId)
@@ -57,6 +60,7 @@ public class NoteService {
     }
 
 
+    @CachePut(value = "notes", key = "#id")
     public NoteResponse update(UUID id, UpdateNoteRequest updateNoteRequest){
         Note note = noteRepository.findById(id)
                 .orElseThrow(() -> new NoteNotFoundException("Note not found"));
@@ -80,6 +84,7 @@ public class NoteService {
                 .orElseThrow( () -> new NoteNotFoundException("Note Not Found"));
     }
 
+    @CacheEvict(value = "notes", key = "#id")
     public void delete(UUID id) {
         UUID userId = getCurrentUserId();
         Note note = noteRepository.findByIdAndUserIdAndDeletedAtIsNull(id, userId)
