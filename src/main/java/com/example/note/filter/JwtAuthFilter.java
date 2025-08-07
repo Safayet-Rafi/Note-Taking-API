@@ -3,6 +3,8 @@ package com.example.note.filter;
 import com.example.note.service.UserDetailsServiceImpl;
 import com.example.note.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.SignatureException;
 
 @Component
 @AllArgsConstructor
@@ -63,9 +66,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
             response.getWriter().write("Access token expired");
-        } catch (Exception e) {
+        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid access token");
+        }
+        catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().write(e.toString());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("Internal server error");
         }
     }
 
