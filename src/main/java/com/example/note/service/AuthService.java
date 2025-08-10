@@ -3,6 +3,7 @@ package com.example.note.service;
 import com.example.note.dto.request.RefreshTokenRequest;
 import com.example.note.dto.request.SignInRequest;
 import com.example.note.dto.request.SignUpRequest;
+import com.example.note.dto.response.EmailMessage;
 import com.example.note.dto.response.SignInResponse;
 import com.example.note.enums.Role;
 import com.example.note.exception.UserAlreadyExist;
@@ -11,6 +12,7 @@ import com.example.note.model.User;
 import com.example.note.repository.UserRepository;
 import com.example.note.util.JwtUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,12 +21,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final EmailProducerService emailProducerService;
 
     public String signUp(SignUpRequest signUpRequest){
         if(userRepository.findByEmail(signUpRequest.email()).isPresent())
@@ -39,6 +43,17 @@ public class AuthService {
         );
 
         userRepository.save(user);
+
+        emailProducerService.sendEmail(
+                new EmailMessage(
+                        user.getEmail(),
+                        "Welcome to Note App!",
+                        "Thank you for signing up!"
+                )
+        );
+
+
+        log.info("Sign Up Successful for user: {}", user.getEmail());
         return "Sign Up Successful";
 
     }
